@@ -38,7 +38,7 @@ Both approaches leverage Azure OpenAI's multimodal capabilities to handle text, 
 ### Full Page Vision OCR Workflow
 
 ```mermaid
-graph LR
+graph TD
 B[Convert each page in PDF to image]
 B --> C;
 subgraph "Process each image"
@@ -57,7 +57,7 @@ style G fill:#f66,stroke:#333,stroke-width:2px
 ### Hybrid Text + Image Description Workflow
 
 ```mermaid
-graph LR
+graph TD
 A[Convert PDF to Markdown via PyMuPDF4LLM]
 subgraph "For each image"
 direction LR
