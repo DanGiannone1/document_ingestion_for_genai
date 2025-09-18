@@ -39,7 +39,7 @@ Both approaches leverage Azure OpenAI's multimodal capabilities to handle text, 
 
 ```mermaid
 graph LR
-B[Convert each page in PDF to image];
+B[Convert each page in PDF to image]
 B --> C;
 subgraph "Process each image"
 direction LR
@@ -47,33 +47,30 @@ C[Pass image to LLM] --> D[LLM transcribes text and describes images/diagrams];
 end
 D --> F[Combine all transcriptions/descriptions into final markdown output];
 F --> G[End];
+style B fill:#f9f,stroke:#333,stroke-width:2px
+style C fill:#ccf,stroke:#333,stroke-width:2px
+style D fill:#bbf,stroke:#333,stroke-width:2px
+style F fill:#9f9,stroke:#333,stroke-width:2px
+style G fill:#f66,stroke:#333,stroke-width:2px
 ```
 
 ### Hybrid Text + Image Description Workflow
 
 ```mermaid
-flowchart TB
-    Start([PDF Document]) --> Extract[pymupdf4llm extracts<br/>text + embedded images]
-    Extract --> Parse[Parse Markdown with<br/>base64 images]
-    
-    Parse --> FindImages{Find all<br/>embedded images}
-    
-    FindImages --> ImgLoop[For each image]
-    ImgLoop --> Context[Extract surrounding<br/>text context<br/>±400 chars]
-    Context --> Clean[Strip images from<br/>context text]
-    Clean --> SendVision[Send to Azure OpenAI:<br/>- Image data URL<br/>- Context text]
-    
-    SendVision --> Describe[LLM generates<br/>detailed description]
-    Describe --> Replace[Replace image with:<br/>> Image: description]
-    
-    Replace --> ImgLoop
-    ImgLoop -->|All processed| Reassemble[Reassemble final<br/>Markdown document]
-    
-    Reassemble --> Output([Final Markdown])
-    
-    style Start fill:#e1f5fe
-    style Output fill:#c8e6c9
-    style SendVision fill:#fff3e0
+graph LR
+A[Convert PDF to Markdown via PyMuPDF4LLM]
+subgraph "For each image"
+direction LR
+B[Pass image to LLM] --> C[LLM generates description of image]
+C --> D[Replace base64 with description in Markdown]
+end
+A --> B
+D --> E[Final Markdown Output]
+style A fill:#a3d3ff,stroke:#333,stroke-width:2px
+style B fill:#a3d3ff,stroke:#333,stroke-width:2px
+style C fill:#FFA500,stroke:#333,stroke-width:2px
+style D fill:#a3d3ff,stroke:#333,stroke-width:2px
+style E fill:#9f9,stroke:#333,stroke-width:2px
 ```
 
 ## 🔧 Installation
