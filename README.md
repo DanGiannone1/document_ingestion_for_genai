@@ -1,6 +1,5 @@
-# PDF to Markdown Converter with Azure OpenAI
+# Convert PDFs to clean markdown with GenAI
 
-🚀 **Transform PDFs into clean, structured Markdown** using Azure OpenAI's vision capabilities. This repository provides two powerful approaches for converting PDF documents to Markdown format while preserving structure and handling visual content intelligently.
 
 ## 📋 Table of Contents
 - [Overview](#overview)
@@ -15,12 +14,13 @@
 
 ## 🎯 Overview
 
+Complex PDFs often contain a mix of text, tables, charts, and images that are difficult to extract cleanly. Traditional ML methods and libraries fall short as PDF formats are so diverse. The only truly reliable way to extract and structure content is to use a multimodal LLM with vision capabilities. This project demonstrates two approaches to convert PDFs to Markdown using multi-modal LLMs. Once the PDFs are in Markdown, they can be easily ingested into vector databases or sent to LLMs directly for GenAI applications such as retrieval-augmented generation (RAG) chatbots or extracting structured data from unstructured documents. 
 This project offers two distinct methods for converting PDFs to Markdown:
 
 1. **Full Page Vision OCR** (`pdf_to_markdown_full_ocr.py`): Renders entire PDF pages as images and uses LLM vision to transcribe and structure content
 2. **Hybrid Text + Image Description** (`pdf_to_markdown_with_image_descriptions.py`): Extracts text using PyMuPDF and replaces embedded images with AI-generated descriptions
 
-Both approaches leverage Azure OpenAI's multimodal capabilities to handle text, tables, figures, and complex layouts.
+Both approaches leverage GPT-4.1's multimodal capabilities to handle images and graphics.
 
 ## ✨ Features
 
@@ -41,7 +41,7 @@ Both approaches leverage Azure OpenAI's multimodal capabilities to handle text, 
 graph TD
 B[Convert each page in PDF to image]
 B --> C
-subgraph "Process each image"
+subgraph "For each image"
 direction LR
 C[Pass image to LLM] --> D[LLM transcribes text and describes images/diagrams]
 end
@@ -94,35 +94,38 @@ class E output;
 ## 🔧 Installation
 
 ### Prerequisites
-- Python 3.8+
-- Azure subscription with Azure AI Projects access
+- Python 3.12+
 - Azure OpenAI deployment (GPT-4 Vision recommended)
+
+### Create a virtual environment (recommended)
+
+Windows (PowerShell):
+```powershell
+python -m venv .venv
+# Activate the venv
+.\.venv\Scripts\Activate.ps1
+# If you see an execution policy error, run (once) in an elevated PowerShell:
+#   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+macOS / Linux:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
 ### Install Dependencies
 
 ```bash
-# Clone the repository
-git clone https://github.com/DanGiannone1/document_ingestion_for_genai.git
-cd document_ingestion_for_genai
-
-# Install required packages
+# Upgrade pip inside the venv and install required packages
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-**requirements.txt:**
-```txt
-pymupdf>=1.23.0
-pymupdf4llm>=0.0.5
-pillow>=10.0.0
-azure-identity>=1.15.0
-azure-ai-projects>=1.0.0
-python-dotenv>=1.0.0
-openai>=1.0.0
-```
 
 ## ⚙️ Configuration
 
-Create a `.env` file in the project root:
+Rename `example.env` to `.env` in the project root and set the required environment variables:
 
 ```env
 # Required Azure AI configuration
@@ -138,16 +141,15 @@ VISION_MAX_CONTEXT_CHARS=1000
 
 ### Azure Setup
 
-1. Create an Azure AI Project in [Azure AI Studio](https://ai.azure.com)
-2. Deploy a GPT-4 Vision model
-3. Copy your project endpoint and deployment name
-4. Ensure your Azure credentials are configured (Azure CLI, managed identity, or service principal)
-
+1. Create an Azure AI Project in Azure AI Foundry
+2. Deploy GPT4.1
+3. Ensure your Azure credentials are configured (az login for local dev or use Managed Identity in Azure)
+    
 ## 📖 Usage
 
 ### Full Page Vision OCR Approach
 
-Best for: **Scanned documents, complex layouts, handwritten text, or when maximum fidelity is needed**
+Best for: **Scanned documents, complex layouts, handwritten text, or when maximum fidelity is needed. Also useful when each page contains many images that should be processed together**
 
 ```bash
 # Basic usage
@@ -165,7 +167,7 @@ python pdf_to_markdown_full_ocr.py input.pdf --no-page-headings
 
 ### Hybrid Text + Image Description Approach
 
-Best for: **Digital PDFs with embedded images, when you need faster processing**
+Best for: **Digital PDFs with embedded images**
 
 ```bash
 # Basic usage
@@ -179,12 +181,12 @@ python pdf_to_markdown_with_image_descriptions.py input.pdf -o output.md
 
 | Feature | Full Page Vision | Hybrid Approach |
 |---------|-----------------|-----------------|
-| **Method** | Renders entire pages as images | Extracts text, processes images separately |
+| **Method** | Renders entire pages as images | Extracts text via PyMuPDF4LLM, processes images separately |
 | **Best For** | Scanned PDFs, complex layouts | Digital PDFs with clear text |
 | **Accuracy** | Highest for all content types | High for text, depends on PyMuPDF for structure |
-| **Processing Time** | Slower (full page vision) | Faster (only images use vision) |
+| **Processing Time** | Slower (full page vision) | Faster (unless multiple images per page) |
 | **Token Usage** | Higher (~3500 tokens/page) | Lower (varies by image count) |
-| **Layout Preservation** | Excellent | Good |
+| **Layout Preservation** | Excellent | Excellent |
 | **Handwritten Text** | ✅ Supported | ❌ Not supported |
 | **Image Handling** | Describes in context | Describes with surrounding text |
 | **Page Range Selection** | ✅ Supported | ❌ Full document only |
