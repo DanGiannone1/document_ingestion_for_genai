@@ -38,33 +38,15 @@ Both approaches leverage Azure OpenAI's multimodal capabilities to handle text, 
 ### Full Page Vision OCR Workflow
 
 ```mermaid
-flowchart TB
-    Start([PDF Document]) --> Load[Load PDF with PyMuPDF]
-    Load --> PageLoop{For each page}
-    
-    PageLoop --> Render[Render page at 280 DPI]
-    Render --> Convert[Convert to PIL Image]
-    Convert --> SizeCheck{Image size OK?}
-    
-    SizeCheck -->|Too large| Compress[Try JPEG compression<br/>Quality: 85→35]
-    Compress --> StillLarge{Still too large?}
-    StillLarge -->|Yes| Downscale[Downscale image<br/>Min: 720px edge]
-    StillLarge -->|No| Encode
-    SizeCheck -->|OK| Encode[Base64 encode]
-    Downscale --> Encode
-    
-    Encode --> SendLLM[Send to Azure OpenAI<br/>with vision prompt]
-    SendLLM --> Extract[LLM extracts:<br/>- Text verbatim<br/>- Structure<br/>- IMAGE: descriptions]
-    
-    Extract --> Format[Format as Markdown<br/>Add page headers]
-    Format --> PageLoop
-    
-    PageLoop -->|Done| Combine[Combine all pages]
-    Combine --> Output([Final Markdown])
-    
-    style Start fill:#e1f5fe
-    style Output fill:#c8e6c9
-    style SendLLM fill:#fff3e0
+graph LR
+B[Convert each page in PDF to image];
+B --> C;
+subgraph "Process each image"
+direction LR
+C[Pass image to LLM] --> D[LLM transcribes text and describes images/diagrams];
+end
+D --> F[Combine all transcriptions/descriptions into final markdown output];
+F --> G[End];
 ```
 
 ### Hybrid Text + Image Description Workflow
