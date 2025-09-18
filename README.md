@@ -67,7 +67,7 @@ class G term;
 
 ```mermaid
 graph TD
-A[Convert PDF to Markdown via PyMuPDF4LLM]
+A[Convert PDF to Markdown via PyMuPDF4LLM with embedded base64 images]
 subgraph "For each image"
 direction LR
 B[Pass image to LLM] --> C[LLM generates description of image]
