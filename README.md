@@ -40,18 +40,27 @@ Both approaches leverage Azure OpenAI's multimodal capabilities to handle text, 
 ```mermaid
 graph TD
 B[Convert each page in PDF to image]
-B --> C;
+B --> C
 subgraph "Process each image"
 direction LR
-C[Pass image to LLM] --> D[LLM transcribes text and describes images/diagrams];
+C[Pass image to LLM] --> D[LLM transcribes text and describes images/diagrams]
 end
-D --> F[Combine all transcriptions/descriptions into final markdown output];
-F --> G[End];
-style B fill:#f9f,stroke:#333,stroke-width:2px
-style C fill:#ccf,stroke:#333,stroke-width:2px
-style D fill:#bbf,stroke:#333,stroke-width:2px
-style F fill:#9f9,stroke:#333,stroke-width:2px
-style G fill:#f66,stroke:#333,stroke-width:2px
+D --> F[Combine all transcriptions/descriptions into final markdown output]
+
+
+%% ---- Reusable style classes (readable on GitHub light & dark) ----
+classDef llm fill:#FFB000,stroke:#333,stroke-width:1px,color:#111;
+classDef nonllm fill:#A3D3FF,stroke:#333,stroke-width:1px,color:#111;
+classDef output fill:#B8F2C2,stroke:#333,stroke-width:1px,color:#111;
+classDef term fill:#EDEDED,stroke:#333,stroke-width:1px,color:#111;
+
+%% ---- Apply classes ----
+class B nonllm;
+class C llm;
+class D llm;
+class F output;
+class G term;
+
 ```
 
 ### Hybrid Text + Image Description Workflow
@@ -66,11 +75,20 @@ C --> D[Replace base64 with description in Markdown]
 end
 A --> B
 D --> E[Final Markdown Output]
-style A fill:#a3d3ff,stroke:#333,stroke-width:2px
-style B fill:#a3d3ff,stroke:#333,stroke-width:2px
-style C fill:#FFA500,stroke:#333,stroke-width:2px
-style D fill:#a3d3ff,stroke:#333,stroke-width:2px
-style E fill:#9f9,stroke:#333,stroke-width:2px
+
+%% ---- Reusable style classes (readable on GitHub light & dark) ----
+classDef llm fill:#FFB000,stroke:#333,stroke-width:1px,color:#111;
+classDef nonllm fill:#A3D3FF,stroke:#333,stroke-width:1px,color:#111;
+classDef output fill:#B8F2C2,stroke:#333,stroke-width:1px,color:#111;
+classDef term fill:#EDEDED,stroke:#333,stroke-width:1px,color:#111;
+
+%% ---- Apply classes ----
+class A nonllm;
+class B llm;
+class C llm;
+class D nonllm;
+class E output;
+
 ```
 
 ## 🔧 Installation
